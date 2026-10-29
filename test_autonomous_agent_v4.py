@@ -37,6 +37,10 @@ class TestAgentV4(unittest.TestCase):
         with self.assertRaises(ValueError):
             agent.read_knowledge_file("../ai_memory.db")
 
+    def test_list_knowledge_files(self):
+        files = agent.list_knowledge_files()
+        self.assertIsInstance(files, list)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
