@@ -32,6 +32,7 @@ Language commands:
 - `/lang en` — answer in English
 - `/lang auto` — infer language from the user's message
 - `/files` — list `.txt` and `.md` files under `knowledge/`
+- `/help` — show bilingual help menu
 
 ## First acceptance checks
 1. `Calculate 1250 * 24 + 3600` returns 33,600 and `PASS` from local calculation.
