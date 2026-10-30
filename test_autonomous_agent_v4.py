@@ -37,6 +37,13 @@ class TestAgentV4(unittest.TestCase):
         with self.assertRaises(ValueError):
             agent.read_knowledge_file("../ai_memory.db")
 
+    def test_get_help_text(self):
+        help_text = agent.get_help_text()
+        self.assertIn("/lang", help_text)
+        self.assertIn("/files", help_text)
+        self.assertIn("/help", help_text)
+        self.assertIn("exit", help_text)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

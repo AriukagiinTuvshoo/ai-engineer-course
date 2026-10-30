@@ -120,6 +120,19 @@ def _safe_knowledge_path(filename: str) -> Path:
     return path
 
 
+def get_help_text() -> str:
+    """Return bilingual help message describing available commands."""
+    return (
+        "Commands / Коммандууд:\n"
+        "  /lang mn   — Хариултыг монгол хэлээр авах (Answer in Mongolian)\n"
+        "  /lang en   — Хариултыг англи хэлээр авах (Answer in English)\n"
+        "  /lang auto — Хэлийг автоматаар тодорхойлох (Automatic language detection)\n"
+        "  /files     — knowledge/ фолдер дахь файлуудыг жагсаах (List knowledge files)\n"
+        "  /help      — Тусламжийн цэс харуулах (Show help menu)\n"
+        "  exit/quit  — Системээс гарах (Exit application)"
+    )
+
+
 def list_knowledge_files() -> list[str]:
     KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
     return sorted(p.name for p in KNOWLEDGE_DIR.iterdir() if p.is_file() and p.suffix.lower() in {".txt", ".md"})
@@ -307,7 +320,7 @@ def main() -> None:
     print("=" * 44)
     print("MN/EN bilingual • local file reader • safe calculator")
     print("Existing ai_assistant.py, ai_memory.db, autonomous_agent_v3.py are not modified.")
-    print("Commands: /lang mn | /lang en | /lang auto | /files | гарах / exit / quit")
+    print("Commands: /lang mn | /lang en | /lang auto | /files | /help | гарах / exit / quit")
     print(f"Primary model: {PRIMARY_MODEL}; multi-agent mode: {'ON' if MULTI_AGENT else 'OFF'}")
     KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
     init_memory()
@@ -344,6 +357,9 @@ def main() -> None:
         if user_text == "/files":
             files = list_knowledge_files()
             print("\n".join(files) if files else "(knowledge folder has no .txt/.md files)")
+            continue
+        if user_text.lower() in {"/help", "help", "/?"}:
+            print(f"\n{get_help_text()}")
             continue
 
         print("\n[RUN] Processing request...")
