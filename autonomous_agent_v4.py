@@ -196,6 +196,37 @@ def wants_summary(text: str) -> bool:
     return bool(re.search(r"\b(summarize|summary|explain|main idea|key points|describe)\b|гол\s*санаа|тайлбарла|дүгнэ|хураангуйл", text, re.IGNORECASE))
 
 
+def format_help(lang: str = "en") -> str:
+    """Return formatted CLI help text in Mongolian or English."""
+    if lang == "mn":
+        return (
+            "=== Тусламж ба Ашиглах заавар ===\n"
+            "Командууд:\n"
+            "  /help, /?       - Энэхүү тусламжийн цэсийг харуулах\n"
+            "  /files          - 'knowledge/' хавтас дахь файлуудыг жагсаах\n"
+            "  /lang mn        - Хариултыг Монгол хэлээр авах\n"
+            "  /lang en        - Хариултыг Англи хэлээр авах\n"
+            "  /lang auto      - Хэлийг автоматаар тохируулах\n"
+            "  гарах / exit    - Программаас гарах\n\n"
+            "Жишээ асуултууд:\n"
+            "  - Тооцоолол: '1250 * 24 + 3600'\n"
+            "  - Файл унших: 'ai_engineering_notes.txt файлыг уншаад тайлбарла'"
+        )
+    return (
+        "=== Help & Usage Guide ===\n"
+        "Commands:\n"
+        "  /help, /?       - Display this help menu\n"
+        "  /files          - List files in the 'knowledge/' folder\n"
+        "  /lang mn        - Force response language to Mongolian\n"
+        "  /lang en        - Force response language to English\n"
+        "  /lang auto      - Auto-detect response language\n"
+        "  exit / quit     - Exit the application\n\n"
+        "Example queries:\n"
+        "  - Calculation: 'Calculate 1250 * 24 + 3600'\n"
+        "  - File reading: 'Summarize ai_engineering_notes.txt'"
+    )
+
+
 def build_system_instruction(language: str) -> str:
     lang = "Mongolian" if language == "mn" else "English"
     return (
@@ -307,7 +338,7 @@ def main() -> None:
     print("=" * 44)
     print("MN/EN bilingual • local file reader • safe calculator")
     print("Existing ai_assistant.py, ai_memory.db, autonomous_agent_v3.py are not modified.")
-    print("Commands: /lang mn | /lang en | /lang auto | /files | гарах / exit / quit")
+    print("Commands: /help | /lang mn | /lang en | /lang auto | /files | гарах / exit / quit")
     print(f"Primary model: {PRIMARY_MODEL}; multi-agent mode: {'ON' if MULTI_AGENT else 'OFF'}")
     KNOWLEDGE_DIR.mkdir(parents=True, exist_ok=True)
     init_memory()
@@ -329,6 +360,10 @@ def main() -> None:
         if user_text.lower() in {"гарах", "exit", "quit"}:
             print("Bye / Баяртай.")
             break
+        if user_text.lower() in {"/help", "/?"}:
+            lang = language_override or detect_language(user_text)
+            print("\n" + format_help(lang))
+            continue
         if user_text == "/lang mn":
             language_override = "mn"
             print("Хариултын хэл: Монгол")
@@ -343,7 +378,13 @@ def main() -> None:
             continue
         if user_text == "/files":
             files = list_knowledge_files()
-            print("\n".join(files) if files else "(knowledge folder has no .txt/.md files)")
+            if files:
+                print(f"\nKnowledge files ({len(files)}):")
+                for f in files:
+                    print(f"  • {f}")
+                print("Tip: Mention filename in your prompt to read or summarize it.")
+            else:
+                print("\n(knowledge folder has no .txt/.md files)")
             continue
 
         print("\n[RUN] Processing request...")
